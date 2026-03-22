@@ -1,6 +1,5 @@
 # Machine Learning na Pratica no Azure ML
 
-Este repositorio deixou de ser apenas um resumo do portal e virou um pipeline real de machine learning para prever aluguel de bicicletas. O projeto agora treina, avalia e executa inferencia localmente com o dataset classico de bike rentals, mas ja inclui artefatos prontos para portar o fluxo ao Azure ML.
 
 ## O que o projeto entrega
 
@@ -115,10 +114,6 @@ pytest
 ```
 
 O teste cobre treino, avaliacao e inferencia ponta a ponta.
-
-## Proximos passos
-
-- adicionar endpoint de API para predicao
 - registrar modelos por versao
 - incluir tracking de experimentos
 - criar deployment para online endpoint
