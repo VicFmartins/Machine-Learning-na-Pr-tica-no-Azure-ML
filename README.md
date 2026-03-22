@@ -1,62 +1,124 @@
-# Machine-Learning-na-Pr-tica-no-Azure-ML
-BOOT CAMP MICROSFT AZURE
-Este repositório contém um projeto desenvolvido utilizando o Azure Machine Learning Studio para treinar um modelo preditivo de aluguel de bicicletas. O objetivo é prever o número de aluguéis de bicicletas em um determinado dia com base em características sazonais e meteorológicas utilizando aprendizado de máquina automatizado (AutoML).
+# Machine Learning na Pratica no Azure ML
 
-Dados Utilizados
-Os dados utilizados neste projeto são derivados da Capital Bikeshare e estão em conformidade com o contrato de licença de dados publicado. O conjunto de dados foi criado e configurado com as seguintes especificações:
+Este repositorio deixou de ser apenas um resumo do portal e virou um pipeline real de machine learning para prever aluguel de bicicletas. O projeto agora treina, avalia e executa inferencia localmente com o dataset classico de bike rentals, mas ja inclui artefatos prontos para portar o fluxo ao Azure ML.
 
-Tipo de dados: Tabular
-Fonte: https://aka.ms/bike-rentals
-Formato do arquivo: Delimitado por vírgula
-Codificação: UTF-8
-Configuração do Projeto
-Criação do Trabalho de ML Automatizado
-No Azure Machine Learning Studio, foi criado um novo trabalho de ML automatizado com as seguintes configurações:
+## O que o projeto entrega
 
-Nome do trabalho: mslearn-bike-automl
-Tipo de tarefa: Regressão
-Conjunto de dados: aluguel de bicicletas
-Coluna de destino: Aluguéis
-Métrica primária: raiz do erro quadrático médio normalizado
-Modelos permitidos: RandomForest e LightGBM
-Limites e Validações
-Máximo de testes: 3
-Tempo limite de iteração: 15 minutos
-Tipo de validação: divisão de validação de trem com 10% dos dados para validação
-Avaliação do Modelo
-Após o término do treinamento, o melhor modelo foi avaliado usando as métricas disponíveis e gráficos de desempenho como o gráfico de resíduos e predito vs. real.
+- treino local de modelo de regressao
+- comparacao entre modelos candidatos
+- avaliacao com `RMSE`, `MAE` e `R²`
+- script de inferencia a partir de JSON
+- dataset real do exemplo de bike rentals
+- arquivos base para command job no Azure ML
+- testes automatizados
 
-Implantação do Modelo
-O melhor modelo foi implantado como um serviço web no Azure com a seguinte configuração:
+## Estrutura
 
-Nome: prever-aluguéis
-Tipo de computação: Instância de Contêiner do Azure
-Habilitar autenticação: Sim
-Teste do Serviço Implantado
-O serviço web implantado foi testado utilizando o seguinte JSON de entrada para prever o número de aluguéis:
+- `src/train.py`: treino e selecao do melhor modelo
+- `src/evaluate.py`: avaliacao do modelo salvo
+- `src/predict.py`: inferencia com payload JSON
+- `src/data_utils.py`: carregamento do dataset e definicao de features
+- `azureml/command-job.yml`: job base para Azure ML
+- `azureml/environment.yml`: ambiente do job
+- `examples/sample-request.json`: payload de exemplo
+- `data/bike-rentals/bike-data/daily-bike-share.csv`: dataset usado no pipeline
 
-json
-Copy code
-{
-  "Inputs": { 
-    "data": [
-      {
-        "day": 1,
-        "mnth": 1,   
-        "year": 2022,
-        "season": 2,
-        "holiday": 0,
-        "weekday": 1,
-        "workingday": 1,
-        "weathersit": 2, 
-        "temp": 0.3, 
-        "atemp": 0.3,
-        "hum": 0.3,
-        "windspeed": 0.3 
-      }
-    ]    
-  },   
-  "GlobalParameters": 1.0
-}
-Os resultados do teste confirmaram a precisão do modelo com a previsão do número de aluguéis.
+## Como executar localmente
 
+### Instalar dependencias
+
+```bash
+pip install -r requirements.txt
+```
+
+### Treinar
+
+```bash
+python src/train.py
+```
+
+### Avaliar
+
+```bash
+python src/evaluate.py
+```
+
+### Prever
+
+```bash
+python src/predict.py
+```
+
+## Caso de uso
+
+O modelo tenta prever a quantidade de alugueis de bicicletas com base em:
+
+- sazonalidade
+- mes e dia
+- dia util e feriado
+- condicao climatica
+- temperatura
+- umidade
+- velocidade do vento
+
+## Artefatos gerados
+
+Depois do treino, o projeto salva em `models/`:
+
+- `model.joblib`
+- `metrics.json`
+
+## Resultado validado localmente
+
+No treino executado neste ambiente, o melhor modelo foi `gradient_boosting` com:
+
+- `RMSE`: `263.871`
+- `MAE`: `167.8235`
+- `R²`: `0.8213`
+
+Modelos comparados:
+
+- `linear_regression`
+- `random_forest`
+- `gradient_boosting`
+
+No payload de exemplo em [sample-request.json](C:/Users/vitor/OneDrive/Documentos/Playground/repo-azure-ml-pratica/examples/sample-request.json), a inferencia local retornou previsao de `217.3` alugueis.
+
+## Azure ML
+
+O projeto inclui uma base simples para subir o treino como command job no Azure ML usando:
+
+- [command-job.yml](C:/Users/vitor/OneDrive/Documentos/Playground/repo-azure-ml-pratica/azureml/command-job.yml)
+- [environment.yml](C:/Users/vitor/OneDrive/Documentos/Playground/repo-azure-ml-pratica/azureml/environment.yml)
+
+Isso ajuda a mostrar o fluxo completo:
+
+- validacao local
+- empacotamento do treino
+- migracao para o workspace gerenciado
+
+O job YAML usa `uri_file` como entrada e `uri_folder` como saida, seguindo o estilo atual do Azure ML CLI v2.
+
+## Referencias oficiais
+
+Para alinhar o projeto com o estado atual da plataforma, usei como base a documentacao oficial da Microsoft sobre Azure Machine Learning:
+
+- [What is Azure Machine Learning?](https://learn.microsoft.com/en-us/azure/machine-learning/overview-what-is-azure-machine-learning?view=azureml-api-2)
+- [What is automated machine learning (AutoML)?](https://learn.microsoft.com/en-us/azure/machine-learning/concept-automated-ml?view=azureml-api-2)
+- [CLI v2 command job YAML schema](https://learn.microsoft.com/en-us/azure/machine-learning/reference-yaml-job-command?view=azureml-api-2)
+- [Online endpoints for real-time inference](https://learn.microsoft.com/en-us/azure/machine-learning/concept-endpoints-online?view=azureml-api-2)
+
+## Validacao
+
+```bash
+pytest
+```
+
+O teste cobre treino, avaliacao e inferencia ponta a ponta.
+
+## Proximos passos
+
+- adicionar endpoint de API para predicao
+- registrar modelos por versao
+- incluir tracking de experimentos
+- criar deployment para online endpoint

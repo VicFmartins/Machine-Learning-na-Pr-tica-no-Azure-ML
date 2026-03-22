@@ -1,0 +1,10 @@
+name: bike-rentals-env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - joblib==1.4.2
+      - pandas==2.2.3
+      - scikit-learn==1.6.1
