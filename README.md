@@ -81,14 +81,14 @@ Modelos comparados:
 - `random_forest`
 - `gradient_boosting`
 
-No payload de exemplo em [sample-request.json](C:/Users/vitor/OneDrive/Documentos/Playground/repo-azure-ml-pratica/examples/sample-request.json), a inferencia local retornou previsao de `217.3` alugueis.
+No payload de exemplo em [sample-request.json](examples/sample-request.json), a inferencia local retornou previsao de `217.3` alugueis.
 
 ## Azure ML
 
 O projeto inclui uma base simples para subir o treino como command job no Azure ML usando:
 
-- [command-job.yml](C:/Users/vitor/OneDrive/Documentos/Playground/repo-azure-ml-pratica/azureml/command-job.yml)
-- [environment.yml](C:/Users/vitor/OneDrive/Documentos/Playground/repo-azure-ml-pratica/azureml/environment.yml)
+- [command-job.yml](azureml/command-job.yml)
+- [environment.yml](azureml/environment.yml)
 
 Isso ajuda a mostrar o fluxo completo:
 
